@@ -54,3 +54,9 @@ class CheckBox:
     ALL_SWITCHERS = (HOME_SWITCHER, DESKTOP_SWITCHER, DOCUMENTS_SWITCHER, WORKSPACE_SWITCHER, OFFICE_SWITCHER, DOWNLOADS_SWITCHER)
 
     RESULT = "#result"
+
+class RadioButton:
+
+    YES_BUTTON = "#yesRadio"
+    IMPRESSIVE_BUTTON = "#impressiveRadio"
+    SELECTED_INPUT = ".text-success"

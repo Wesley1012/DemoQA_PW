@@ -1,5 +1,6 @@
 from pages.basepage import BasePage
 from locators.elements_locators import *
+import allure
 from time import sleep
 from dotenv import load_dotenv
 import os
@@ -11,38 +12,46 @@ class ElementsPage(BasePage):
         super().__init__(page)
         self.url = os.getenv('BASE_URL')
 
+
+class TextBoxPage(ElementsPage):
+
+    @allure.step('Заполнить все поля значениями и подтвердить')
     def fill_form_text_box(self,
                            name,
                            email,
-                           curAddress,
-                           perAddress):
+                           current_address,
+                           permanent_address):
         self.fill(TextBox.FULL_NAME, name)
         self.fill(TextBox.EMAIL, email)
-        self.fill(TextBox.CURRENT_ADDRESS, curAddress)
-        self.fill(TextBox.PERMANENT_ADDRESS, perAddress)
-
+        self.fill(TextBox.CURRENT_ADDRESS, current_address)
+        self.fill(TextBox.PERMANENT_ADDRESS, permanent_address)
         self.click(TextBox.SUBMIT_BUTTON)
 
         return self
 
+    @allure.step("Проверить корректность вывода")
     def assert_output_text_box(self,
                                name,
                                email,
-                               curAddress,
-                               perAddress):
+                               current_address,
+                               permanent_address):
         assert self.get_text("#output #name").replace("Name:", "").strip() == name
         assert self.get_text("#output #email").replace("Email:", "").strip() == email
-        assert self.get_text("#output #currentAddress").replace("Current Address :", "").strip() == curAddress
-        assert self.get_text("#output #permanentAddress").replace("Permananet Address :", "").strip() == perAddress
+        assert self.get_text("#output #currentAddress").replace("Current Address :", "").strip() == current_address
+        assert self.get_text("#output #permanentAddress").replace("Permananet Address :", "").strip() == permanent_address
 
     def get_element_title(self):
         return self.get_text('.text-center')
 
+
+class CheckBoxPage(ElementsPage):
+
+    @allure.step('Нажать все чекбоксы')
     def click_all_checkbox(self):
         self.click(CheckBox.HOME_CHECKBOX)
-
         return self
 
+    @allure.step('Нажать все свичи')
     def click_all_switcher(self):
 
         for switcher in CheckBox.ALL_SWITCHERS:
@@ -70,3 +79,19 @@ class ElementsPage(BasePage):
         else:
             assert "switcher_close" in switcher.get_attribute("class") or \
                     "switcher_noop" in switcher.get_attribute("class")
+
+class RadioButtonPage(ElementsPage):
+
+    @allure.step('Кликнуть кнопку "Yes"')
+    def click_yes(self):
+        self.click(RadioButton.YES_BUTTON)
+        return self
+
+    @allure.step('Кликнуть кнопку "Impressive"')
+    def click_impressive(self):
+        self.click(RadioButton.IMPRESSIVE_BUTTON)
+        return self
+
+    def get_result(self):
+        return self.get_text(RadioButton.SELECTED_INPUT)
+
