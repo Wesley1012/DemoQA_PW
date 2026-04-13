@@ -6,3 +6,4 @@ other.py
 .venv
 .env
 structure.txt
+allure-results/

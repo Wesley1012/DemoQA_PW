@@ -1,4 +1,4 @@
-class Elements:
+class ElementsLocators:
     TEXT_BOX = "#item-0"
     CHECK_BOX = "#item-1"
     RADIO_BUTTON = "#item-2"
@@ -9,7 +9,7 @@ class Elements:
     UPLOAD_AND_DOWNLOAD = "#item-7"
     DYNAMIC_PROPERTIES = "#item-8"
 
-class TextBox:
+class TextBoxLocators:
     """Локаторы для страницы Text Box"""
     FULL_NAME = "#userName"
     EMAIL = "#userEmail"
@@ -18,7 +18,7 @@ class TextBox:
     SUBMIT_BUTTON = "#submit"
     OUTPUT = "#output"
 
-class CheckBox:
+class CheckBoxLocators:
     """ Локаторы для страницы Check Box"""
     #Folders
     HOME_CHECKBOX = "[aria-label='Select Home']"
@@ -55,8 +55,33 @@ class CheckBox:
 
     RESULT = "#result"
 
-class RadioButton:
+class RadioButtonLocators:
 
     YES_BUTTON = "#yesRadio"
     IMPRESSIVE_BUTTON = "#impressiveRadio"
     SELECTED_INPUT = ".text-success"
+
+class WebTablesLocators:
+
+    #add
+    ADD_BUTTON = "#addNewRecordButton"
+
+    FIRST_NAME = "#userForm #firstName"
+    LAST_NAME = "#userForm #lastName"
+    USER_EMAIL = "#userForm #userEmail"
+    AGE = "#userForm #age"
+    SALARY = "#userForm #salary"
+    DEPARTMENT = "#userForm #department"
+    SUBMIT = "#userForm #submit"
+
+    #search
+    SEARCH_BOX = "#searchBox"
+    SEARCH_BUTTON = "#basic-addon2"
+
+    #table titles last added
+    TABLE_FIRST_NAME = "tbody tr:last-child td:first-child"
+    TABLE_LAST_NAME = "tbody tr:last-child td:nth-child(2)"
+    TABLE_AGE = "tbody tr:last-child td:nth-child(3)"
+    TABLE_EMAIL = "tbody tr:last-child td:nth-child(4)"
+    TABLE_SALARY = "tbody tr:last-child td:nth-child(5)"
+    TABLE_DEPARTMENT = "tbody tr:last-child td:nth-child(6)"

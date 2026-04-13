@@ -1,10 +1,14 @@
-from pages.elements_page import ElementsPage, RadioButtonPage, CheckBoxPage, TextBoxPage
+import random
+
+from pages.elements_page import ElementsPage, RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage
 from locators.elements_locators import *
 import allure
 from faker import Faker
 import pytest
 from time import sleep
 
+random_age = str(random.randint(1, 100))
+random_salary = str(random.randint(1, 10))+"000"
 fake = Faker()
 
 FULL_RESULT = ('home', 'desktop', 'documents', 'downloads', 'notes', 'commands', 'workspace', 'office', 'wordFile', 'excelFile', 'react', 'angular', 'veu', 'public', 'private', 'classified', 'general')
@@ -46,10 +50,10 @@ class TestCheckBox:
         self.page.click_all_checkbox()
 
 
-        for checkbox in CheckBox.ALL_FOLDERS_CHECKBOX + CheckBox.ALL_FILES_CHECKBOX:
+        for checkbox in CheckBoxLocators.ALL_FOLDERS_CHECKBOX + CheckBoxLocators.ALL_FILES_CHECKBOX:
             self.page.assert_checkbox_is_checked(checkbox)
 
-        for switcher in CheckBox.ALL_SWITCHERS:
+        for switcher in CheckBoxLocators.ALL_SWITCHERS:
             self.page.assert_switcher_state(switcher)
 
         for item in FULL_RESULT:
@@ -59,11 +63,11 @@ class TestCheckBox:
     def test_notes_checkbox(self):
         self.page.navigate('checkbox')
         sleep(1)
-        self.page.click(CheckBox.HOME_SWITCHER)
-        self.page.click(CheckBox.DESKTOP_SWITCHER)
+        self.page.click(CheckBoxLocators.HOME_SWITCHER)
+        self.page.click(CheckBoxLocators.DESKTOP_SWITCHER)
 
-        self.page.assert_switcher_state(CheckBox.DESKTOP_SWITCHER)
-        self.page.assert_checkbox_is_checked(CheckBox.NOTES_CHECKBOX, False)
+        self.page.assert_switcher_state(CheckBoxLocators.DESKTOP_SWITCHER)
+        self.page.assert_checkbox_is_checked(CheckBoxLocators.NOTES_CHECKBOX, False)
         # self.page.assert_switcher_or_checkbox_is_checked(CheckBox.DOCUMENTS_SWITCHER) == False
 
 @allure.title("Кнопки Radio Button")
@@ -82,3 +86,26 @@ class TestRadioButton:
         self.page.click_impressive()
         with allure.step('Проверить, что результат "Impressive"'):
             assert self.page.get_result() == "Impressive"
+
+class TestWebTables:
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self, page):
+        self.page = WebTablesPage(page)
+        self.page.navigate('webtables')
+
+
+    @allure.description("""
+     Тест проверяет добавление пользователя в таблицу:
+     1) Нажимает кнопку "Add".
+     2) Заполняет все поля валидными значениями.
+     3) Нажимает кнопку "Submit".
+     4) Проверяет, что в таблице появился новый пользователь с ведёнными раннее значениями.
+    """)
+    @pytest.mark.parametrize('first_name, last_name, email, age, salary, department',[
+                             (str(fake.first_name()), str(fake.last_name()), fake.email(), random_age, random_salary, fake.company())
+                                ])
+    def test_add_new_user(self, first_name, last_name, email, age, salary, department):
+
+        self.page.fill_new_user_and_submit(first_name, last_name, email, age, salary, department)
+
