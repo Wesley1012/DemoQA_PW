@@ -1,5 +1,6 @@
 from pages.basepage import BasePage
 from locators.elements_locators import *
+from playwright.sync_api import expect
 import allure
 from time import sleep
 from dotenv import load_dotenv
@@ -68,12 +69,12 @@ class CheckBoxPage(ElementsPage):
         return result_text
 
     def assert_checkbox_is_checked(self, selector, expected_state=True):
-        item = self.find_locator(selector)
+        item = self.locator(selector)
         actural_state = item.get_attribute("aria-checked") == 'true'
         assert actural_state == expected_state
 
     def assert_switcher_state(self, selector, should_be_open=True):
-        switcher = self.find_locator(selector)
+        switcher = self.locator(selector)
         if should_be_open:
             assert "switcher_open" in switcher.get_attribute("class")
         else:
@@ -115,3 +116,30 @@ class WebTablesPage(ElementsPage):
             assert self.get_text(WebTablesLocators.TABLE_AGE) == age
             assert self.get_text(WebTablesLocators.TABLE_SALARY) == salary
             assert self.get_text(WebTablesLocators.TABLE_DEPARTMENT) == departament
+
+class ClickMeButtonsPage(ElementsPage):
+
+    DOUBLE_CLICK_BUTTON = "#doubleClickBtn"
+    RIGHT_CLICK_BUTTON = "#rightClickBtn"
+
+    DOUBLE_CLICK_MESSAGE = '#doubleClickMessage'
+    RIGHT_CLICK_MESSAGE = '#rightClickMessage'
+    CLICK_ME_MESSAGE = '#dynamicClickMessage'
+
+    @allure.step('Нажать кнопку двойным кликом и проверить сообщение')
+    def click_double_click_button(self):
+        self.locator(self.DOUBLE_CLICK_BUTTON).dblclick()
+        assert self.locator_to_be_visible(self.DOUBLE_CLICK_MESSAGE)
+        return self
+
+    @allure.step('Нажать кнопку правым кликом и проверить сообщение')
+    def click_right_click_button(self):
+        self.locator(self.RIGHT_CLICK_BUTTON).click(button="right")
+        assert self.locator_to_be_visible(self.RIGHT_CLICK_MESSAGE)
+        return self
+
+    @allure.step('Нажать кнопку и проверить сообщение')
+    def click_clickMe_button(self):
+        self.page.get_by_role("button", name="Click Me", exact=True).click()
+        assert self.locator_to_be_visible(self.CLICK_ME_MESSAGE)
+        return self

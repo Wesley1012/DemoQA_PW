@@ -1,6 +1,5 @@
 import random
-
-from pages.elements_page import ElementsPage, RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage
+from pages.elements_page import RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage, ClickMeButtonsPage
 from locators.elements_locators import *
 import allure
 from faker import Faker
@@ -70,7 +69,7 @@ class TestCheckBox:
         self.page.assert_checkbox_is_checked(CheckBoxLocators.NOTES_CHECKBOX, False)
         # self.page.assert_switcher_or_checkbox_is_checked(CheckBox.DOCUMENTS_SWITCHER) == False
 
-@allure.title("Кнопки Radio Button")
+@allure.feature("Кнопки (Radio Button)")
 class TestRadioButton:
 
     @pytest.fixture(autouse=True)
@@ -78,6 +77,7 @@ class TestRadioButton:
         self.page = RadioButtonPage(page)
         self.page.navigate('radio-button')
 
+    @allure.title("Radio Button")
     def test_radio_button(self):
         self.page.click_yes()
         with allure.step('Проверить, что результат "Yes"'):
@@ -87,6 +87,8 @@ class TestRadioButton:
         with allure.step('Проверить, что результат "Impressive"'):
             assert self.page.get_result() == "Impressive"
 
+
+@allure.feature('Форма таблицы (Web Tables)')
 class TestWebTables:
 
     @pytest.fixture(autouse=True)
@@ -94,7 +96,7 @@ class TestWebTables:
         self.page = WebTablesPage(page)
         self.page.navigate('webtables')
 
-
+    @allure.title("Таблица пользователей")
     @allure.description("""
      Тест проверяет добавление пользователя в таблицу:
      1) Нажимает кнопку "Add".
@@ -108,4 +110,25 @@ class TestWebTables:
     def test_add_new_user(self, first_name, last_name, email, age, salary, department):
 
         self.page.fill_new_user_and_submit(first_name, last_name, email, age, salary, department)
+
+
+@allure.feature('Кнопки с кликами (Buttons)')
+class TestClickButtons:
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self, page):
+        self.page = ClickMeButtonsPage(page)
+        self.page.navigate('buttons')
+
+    @allure.title("Двойной клик")
+    def test_bouble_click_me(self):
+        self.page.click_double_click_button()
+
+    @allure.title("Правый клик")
+    def test_right_click_me(self):
+        self.page.click_right_click_button()
+
+    @allure.title("Клик")
+    def test_clime_me(self):
+        self.page.click_clickMe_button()
 
