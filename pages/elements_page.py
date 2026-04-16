@@ -1,3 +1,5 @@
+import time
+
 from pages.basepage import BasePage
 from locators.elements_locators import *
 from playwright.sync_api import expect
@@ -143,3 +145,70 @@ class ClickMeButtonsPage(ElementsPage):
         self.page.get_by_role("button", name="Click Me", exact=True).click()
         assert self.locator_to_be_visible(self.CLICK_ME_MESSAGE)
         return self
+
+class LinksPage(ElementsPage):
+    SIMPLE_LINK = "#simpleLink"
+    DYNAMIC_LINK = "#dynamicLink"
+
+    CREATED = "#linkWrapper #created"
+    NO_CONTENT = "#linkWrapper #no-content"
+    MOVED = "#linkWrapper #moved"
+    BAD_REQUEST = "#linkWrapper #bad-request"
+    UNAUTHORIZED = "#linkWrapper #unauthorized"
+    FORBIDDEN = "#linkWrapper #forbidden"
+    NOT_FOUND = "#linkWrapper #invalid-url"
+
+    IDS = (
+    "201 Created",
+    "204 No Content",
+    "301 Moved Permanently",
+    "400 Bad Request",
+    "401 Unauthorized",
+    "403 Forbidden",
+    "404 Not Found"
+    )
+
+    STATUS = "p#linkResponse b:first-child"
+    STATUS_TEXT = "p#linkResponse b:last-child"
+    MESSAGE = "p#linkResponse"
+
+    @allure.step("Кликнуть на ссылку Home")
+    def click_simple_link(self):
+        with self.page.context.expect_page() as new_page_info:
+            self.page.click(self.SIMPLE_LINK)
+
+        new_page = new_page_info.value
+        expect(new_page).to_have_url("https://demoqa.com/")
+        self.page = new_page
+        return self
+
+    @allure.step("Кликнуть на динамическую ссылку Home")
+    def click_dynamic_link(self):
+
+        with self.page.context.expect_page() as new_page_info:
+            self.page.click(self.DYNAMIC_LINK)
+
+        new_page = new_page_info.value
+        expect(new_page).to_have_url("https://demoqa.com/")
+        self.page = new_page
+
+        return self
+
+    def get_status_and_status_text(self):
+        try:
+            if self.locator_to_be_visible(self.MESSAGE):
+                result = {
+                    "status": self.get_text(self.STATUS),
+                    "status_text": self.get_text(self.STATUS_TEXT)
+                }
+                return result
+            else:
+                print("Message absent")
+        except:
+            pass
+
+
+    def click_api_call_link(self, link):
+        self.page.locator(link).click()
+        return self
+

@@ -1,5 +1,5 @@
 import random
-from pages.elements_page import RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage, ClickMeButtonsPage
+from pages.elements_page import RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage, ClickMeButtonsPage, LinksPage
 from locators.elements_locators import *
 import allure
 from faker import Faker
@@ -10,7 +10,6 @@ random_age = str(random.randint(1, 100))
 random_salary = str(random.randint(1, 10))+"000"
 fake = Faker()
 
-FULL_RESULT = ('home', 'desktop', 'documents', 'downloads', 'notes', 'commands', 'workspace', 'office', 'wordFile', 'excelFile', 'react', 'angular', 'veu', 'public', 'private', 'classified', 'general')
 
 class TestTextBox:
     @pytest.fixture(autouse=True)
@@ -42,6 +41,8 @@ class TestCheckBox:
         self.page = CheckBoxPage(page)
         self.page.navigate('checkbox')
 
+    FULL_RESULT = ('home', 'desktop', 'documents', 'downloads', 'notes', 'commands', 'workspace', 'office', 'wordFile',
+                   'excelFile', 'react', 'angular', 'veu', 'public', 'private', 'classified', 'general')
 
     def test_all_check_box(self):
         self.page.navigate('checkbox')
@@ -55,7 +56,7 @@ class TestCheckBox:
         for switcher in CheckBoxLocators.ALL_SWITCHERS:
             self.page.assert_switcher_state(switcher)
 
-        for item in FULL_RESULT:
+        for item in self.FULL_RESULT:
             assert item in self.page.get_result_checkbox_text()
 
 
@@ -67,7 +68,7 @@ class TestCheckBox:
 
         self.page.assert_switcher_state(CheckBoxLocators.DESKTOP_SWITCHER)
         self.page.assert_checkbox_is_checked(CheckBoxLocators.NOTES_CHECKBOX, False)
-        # self.page.assert_switcher_or_checkbox_is_checked(CheckBox.DOCUMENTS_SWITCHER) == False
+
 
 @allure.feature("Кнопки (Radio Button)")
 class TestRadioButton:
@@ -131,4 +132,46 @@ class TestClickButtons:
     @allure.title("Клик")
     def test_clime_me(self):
         self.page.click_clickMe_button()
+
+
+@allure.feature('Ссылки (Links)')
+class TestLinks:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, page):
+        self.page = LinksPage(page)
+        self.page.navigate('links')
+
+    @allure.title("Ссылка на главную страницу")
+    def test_simple_link(self):
+        self.page.click_simple_link()
+
+        with allure.step("Проверить, что открылась главная страница"):
+            assert self.page.get_current_url() == "https://demoqa.com/"
+
+    def test_dynamic_link(self):
+        self.page.click_dynamic_link()
+
+        with allure.step("Проверить, что открылась главная страница"):
+            assert self.page.get_current_url() == "https://demoqa.com/"
+
+
+    @allure.title("Ссылка API вызова с статусом {status}: '{status_text}'")
+    @pytest.mark.parametrize("link, status, status_text",[
+        (LinksPage.CREATED, "201", "Created"),
+        (LinksPage.NO_CONTENT, "204", "No Content"),
+        (LinksPage.MOVED, "301", "Moved Permanently"),
+        (LinksPage.BAD_REQUEST, "400", "Bad Request"),
+        (LinksPage.UNAUTHORIZED, "401", "Unauthorized"),
+        (LinksPage.FORBIDDEN, "403", "Forbidden"),
+        (LinksPage.NOT_FOUND, "404", "Not Found"),
+        ], ids=LinksPage.IDS)
+    def test_api_call_link(self, link, status, status_text):
+        self.page.click_api_call_link(link)
+
+        with allure.step("Проверить, что статус и текст выводятся корректно"):
+            message = self.page.get_status_and_status_text()
+            assert message["status"] == status
+            assert message["status_text"] == status_text
+
+
 
