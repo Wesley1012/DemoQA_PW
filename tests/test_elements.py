@@ -13,7 +13,7 @@ fake = Faker()
 
 class TestTextBox:
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = TextBoxPage(page)
         self.page.navigate('text-box')
 
@@ -37,7 +37,7 @@ class TestTextBox:
 @allure.title("Форма Check Box и навигация")
 class TestCheckBox:
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = CheckBoxPage(page)
         self.page.navigate('checkbox')
 
@@ -74,7 +74,7 @@ class TestCheckBox:
 class TestRadioButton:
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = RadioButtonPage(page)
         self.page.navigate('radio-button')
 
@@ -93,7 +93,7 @@ class TestRadioButton:
 class TestWebTables:
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = WebTablesPage(page)
         self.page.navigate('webtables')
 
@@ -117,12 +117,12 @@ class TestWebTables:
 class TestClickButtons:
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = ClickMeButtonsPage(page)
         self.page.navigate('buttons')
 
     @allure.title("Двойной клик")
-    def test_bouble_click_me(self):
+    def test_double_click_me(self):
         self.page.click_double_click_button()
 
     @allure.title("Правый клик")
@@ -130,14 +130,14 @@ class TestClickButtons:
         self.page.click_right_click_button()
 
     @allure.title("Клик")
-    def test_clime_me(self):
+    def test_clickme_me(self):
         self.page.click_clickMe_button()
 
 
 @allure.feature('Ссылки (Links)')
 class TestLinks:
     @pytest.fixture(autouse=True)
-    def setup_method(self, page):
+    def setup_method(self, page, auto_screenshot):
         self.page = LinksPage(page)
         self.page.navigate('links')
 
@@ -146,13 +146,13 @@ class TestLinks:
         self.page.click_simple_link()
 
         with allure.step("Проверить, что открылась главная страница"):
-            assert self.page.get_current_url() == "https://demoqa.com/"
+            assert self.page.get_current_url() == "https://demoqa.com/", "URL отличается от ожидаемого"
 
     def test_dynamic_link(self):
         self.page.click_dynamic_link()
 
         with allure.step("Проверить, что открылась главная страница"):
-            assert self.page.get_current_url() == "https://demoqa.com/"
+            assert self.page.get_current_url() == "https://demoqa.com/", "URL отличается от ожидаемого"
 
 
     @allure.title("Ссылка API вызова с статусом {status}: '{status_text}'")
@@ -170,8 +170,8 @@ class TestLinks:
 
         with allure.step("Проверить, что статус и текст выводятся корректно"):
             message = self.page.get_status_and_status_text()
-            assert message["status"] == status
-            assert message["status_text"] == status_text
+            assert message["status"] == status, "Статус код отличается от ожидаемого"
+            assert message["status_text"] == status_text, "Текст статуса отличается от ожидаемого"
 
 
 
