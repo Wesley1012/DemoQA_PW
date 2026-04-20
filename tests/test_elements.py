@@ -45,34 +45,33 @@ class TestCheckBox:
                    'excelFile', 'react', 'angular', 'veu', 'public', 'private', 'classified', 'general')
 
     def test_all_check_box(self):
-        self.page.navigate('checkbox')
         self.page.click_all_switcher()
         self.page.click_all_checkbox()
 
+        with allure.step("Проверить, что все чекбоксы отмечены"):
+            for checkbox in CheckBoxLocators.ALL_FOLDERS_CHECKBOX + CheckBoxLocators.ALL_FILES_CHECKBOX:
+                self.page.assert_checkbox_is_checked(checkbox)
 
-        for checkbox in CheckBoxLocators.ALL_FOLDERS_CHECKBOX + CheckBoxLocators.ALL_FILES_CHECKBOX:
-            self.page.assert_checkbox_is_checked(checkbox)
+        with allure.step("Проверить, что все свитчеры отмечены"):
+            for switcher in CheckBoxLocators.ALL_SWITCHERS:
+                self.page.assert_switcher_state(switcher)
 
-        for switcher in CheckBoxLocators.ALL_SWITCHERS:
-            self.page.assert_switcher_state(switcher)
-
-        for item in self.FULL_RESULT:
-            assert item in self.page.get_result_checkbox_text()
+        with allure.step("Проверить, что выведен полный результат"):
+            for item in self.FULL_RESULT:
+                assert item in self.page.get_result_checkbox_text()
 
 
     def test_notes_checkbox(self):
-        self.page.navigate('checkbox')
-        sleep(1)
         self.page.click(CheckBoxLocators.HOME_SWITCHER)
         self.page.click(CheckBoxLocators.DESKTOP_SWITCHER)
 
-        self.page.assert_switcher_state(CheckBoxLocators.DESKTOP_SWITCHER)
-        self.page.assert_checkbox_is_checked(CheckBoxLocators.NOTES_CHECKBOX, False)
+        with allure.step("Проверить, что Notes чекбокс не активен"):
+            self.page.assert_switcher_state(CheckBoxLocators.DESKTOP_SWITCHER)
+            self.page.assert_checkbox_is_checked(CheckBoxLocators.NOTES_CHECKBOX, False)
 
 
 @allure.feature("Кнопки (Radio Button)")
 class TestRadioButton:
-
     @pytest.fixture(autouse=True)
     def setup_method(self, page, auto_screenshot):
         self.page = RadioButtonPage(page)
@@ -91,7 +90,6 @@ class TestRadioButton:
 
 @allure.feature('Форма таблицы (Web Tables)')
 class TestWebTables:
-
     @pytest.fixture(autouse=True)
     def setup_method(self, page, auto_screenshot):
         self.page = WebTablesPage(page)
@@ -106,16 +104,17 @@ class TestWebTables:
      4) Проверяет, что в таблице появился новый пользователь с ведёнными раннее значениями.
     """)
     @pytest.mark.parametrize('first_name, last_name, email, age, salary, department',[
-                             (str(fake.first_name()), str(fake.last_name()), fake.email(), random_age, random_salary, fake.company())
-                                ])
+                             (fake.first_name(), fake.last_name(), fake.email(), random_age, random_salary, fake.company())
+                             ])
     def test_add_new_user(self, first_name, last_name, email, age, salary, department):
-
         self.page.fill_new_user_and_submit(first_name, last_name, email, age, salary, department)
+
+        with allure.step("Проверить, что пользователь корректно добавился в таблицу"):
+            self.page.assert_table_values(first_name, last_name, email, age, salary, department)
 
 
 @allure.feature('Кнопки с кликами (Buttons)')
 class TestClickButtons:
-
     @pytest.fixture(autouse=True)
     def setup_method(self, page, auto_screenshot):
         self.page = ClickMeButtonsPage(page)

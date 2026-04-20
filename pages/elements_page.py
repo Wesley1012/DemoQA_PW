@@ -111,13 +111,13 @@ class WebTablesPage(ElementsPage):
         self.fill(WebTablesLocators.DEPARTMENT, departament)
         self.click(WebTablesLocators.SUBMIT)
 
-        with allure.step("Проверить, что пользователь корректно добавился в таблицу"):
-            assert self.get_text(WebTablesLocators.TABLE_FIRST_NAME) == first_name
-            assert self.get_text(WebTablesLocators.TABLE_LAST_NAME) == last_name
-            assert self.get_text(WebTablesLocators.TABLE_EMAIL) == email
-            assert self.get_text(WebTablesLocators.TABLE_AGE) == age
-            assert self.get_text(WebTablesLocators.TABLE_SALARY) == salary
-            assert self.get_text(WebTablesLocators.TABLE_DEPARTMENT) == departament
+    def assert_table_values(self, first_name, last_name, email, age, salary, departament):
+        assert self.get_text(WebTablesLocators.TABLE_FIRST_NAME) == first_name, "Имя не соответствует ожидаемому"
+        assert self.get_text(WebTablesLocators.TABLE_LAST_NAME) == last_name, "Фамилия не соответствует ожидаемому"
+        assert self.get_text(WebTablesLocators.TABLE_EMAIL) == email, "Email не соответствует ожидаемому"
+        assert self.get_text(WebTablesLocators.TABLE_AGE) == age, "Возраст не соответствует ожидаемому"
+        assert self.get_text(WebTablesLocators.TABLE_SALARY) == salary, "Зарплата не соответствует ожидаемомой"
+        assert self.get_text(WebTablesLocators.TABLE_DEPARTMENT) == departament, "Департамент не соответствует ожидаемому"
 
 class ClickMeButtonsPage(ElementsPage):
 
