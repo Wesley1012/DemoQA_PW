@@ -212,7 +212,7 @@ class LinksPage(ElementsPage):
 
 class UploadAndDownloadPage(ElementsPage):
 
-    UPLOAD_BTN = "#uploadFile"
+    UPLOAD_BTN = ".mt-5 #uploadFile"
     UPLOAD_FILE_PATH = "#uploadedFilePath"
     DOWNLOAD_BTN = "div #downloadButton"
 
