@@ -41,3 +41,26 @@ python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 
 .venv\Scripts\activate     # Windows
+
+### Установить зависимости:
+
+pip install -r requirements.txt
+playwright install
+
+sudo pacman -S jdk11-openjdk # Arch linux
+sudo pacman -S allure 
+
+brew install openjdk@11 # macOS
+brew install allure 
+
+winget install Microsoft.OpenJDK.11 # Windows (через winget)
+scoop install allure # Windows (scoop)
+
+### Запуск тестов
+
+pytest
+
+### Запуск с генерацией Allure отчёта(addopts уже прописан см. pytest.ini)
+
+pytest --alluredir=allure-results
+allure serve allure-results # или npx allure serve allure-results в моём случае
