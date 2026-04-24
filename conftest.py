@@ -8,7 +8,7 @@ def browser():
     with sync_playwright() as playwright:
 
         browser = playwright.firefox.launch(
-            headless=True,
+            headless=False,
             args=["--no-sandbox", "--disable-dev-shm-usage"]
         )
 
@@ -60,3 +60,40 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
     setattr(item, "rep_" + rep.when, rep)
+
+
+@pytest.fixture
+def download_cleanup(upload_and_download_page, tmp_path):
+    """Фикстура скачивает файл и удаляет его после теста"""
+    downloaded_files = []
+
+    def download(expected_filename="sampleFile.jpeg"):
+        # Скачиваем файл
+        with upload_and_download_page.page.expect_download() as download_info:
+            upload_and_download_page.click(upload_and_download_page.DOWNLOAD_BTN)
+            download = download_info.value
+
+        # Проверяем имя файла
+        assert download.suggested_filename == expected_filename, \
+            f"Expected '{expected_filename}', got '{download.suggested_filename}'"
+
+        # Сохраняем файл
+        file_path = tmp_path / download.suggested_filename
+        download.save_as(str(file_path))
+
+        # Проверяем что файл сохранился
+        assert file_path.exists(), "File was not saved"
+        assert file_path.stat().st_size > 0, "Downloaded file is empty"
+
+        # Добавляем в список для очистки
+        downloaded_files.append(file_path)
+
+        return file_path
+
+    yield download
+
+    # Удаляем все скачанные файлы
+    for file_path in downloaded_files:
+        if file_path.exists():
+            file_path.unlink()
+            print(f"Deleted: {file_path}")

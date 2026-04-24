@@ -1,11 +1,9 @@
 import time
-
 from pages.basepage import BasePage
 from locators.elements_locators import *
 from playwright.sync_api import expect
-import allure
-from time import sleep
 from dotenv import load_dotenv
+import allure
 import os
 
 load_dotenv()
@@ -212,3 +210,32 @@ class LinksPage(ElementsPage):
         self.page.locator(link).click()
         return self
 
+class UploadAndDownloadPage(ElementsPage):
+
+    UPLOAD_BTN = "#uploadFile"
+    UPLOAD_FILE_PATH = "#uploadedFilePath"
+    DOWNLOAD_BTN = "div #downloadButton"
+
+    @allure.step("Загрузить файл")
+    def upload_file(self, tmp_path, file_name="test_file.png" ):
+        test_file = tmp_path / f"{file_name}"
+        test_file.write_bytes(b'test_content')
+
+        self.locator(self.UPLOAD_BTN).set_input_files(str(test_file))
+
+        return self
+
+    def get_upload_path_text(self):
+        return self.get_text(self.UPLOAD_FILE_PATH)
+
+    @allure.step("Скачать файл")
+    def download_file(self, tmp_path):
+        """Скачивает файл и возвращает путь к нему"""
+        with self.page.expect_download() as download_info:
+            self.click(self.DOWNLOAD_BTN)
+            download = download_info.value
+
+        file_path = tmp_path / download.suggested_filename
+        download.save_as(str(file_path))
+
+        return file_path

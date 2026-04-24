@@ -1,5 +1,5 @@
 import random
-from pages.elements_page import RadioButtonPage, CheckBoxPage, TextBoxPage, WebTablesPage, ClickMeButtonsPage, LinksPage
+from pages.elements_page import *
 from locators.elements_locators import *
 import allure
 from faker import Faker
@@ -173,4 +173,25 @@ class TestLinks:
             assert message["status_text"] == status_text, "Текст статуса отличается от ожидаемого"
 
 
+@allure.feature('Загрузка и скачивание файла (upload-download)')
+class TestUploadAndDownloadPage:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, page, auto_screenshot):
+        self.page = UploadAndDownloadPage(page)
+        self.page.navigate("upload-download")
 
+    @allure.title("Загрузка файла")
+    def test_upload_file(self, tmp_path, file_name=f'{fake.words()}.png'):
+        self.page.upload_file(tmp_path, file_name=file_name)
+
+        with allure.step("Проверить путь загруженного файла"):
+            assert self.page.get_upload_path_text() == f'C:\\fakepath\\{file_name}'
+
+    @allure.title("Скачивание файла")
+    def test_download(self, tmp_path):
+        file_path = self.page.download_file(tmp_path)
+
+        with allure.step("Проверить название скачанного файла"):
+            assert file_path.name == "sampleFile.jpeg"
+
+        file_path.unlink() #удалить файл
