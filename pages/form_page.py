@@ -45,3 +45,24 @@ class FormsPage(BasePage):
     def fill_email(self, email: str):
         self.fill(self.USER_EMAIL, email)
         return self
+
+    def choose_gender(self, gender="male"):
+        if gender.lower() == 'male':
+            self.click(self.GENDER_MALE)
+        elif gender.lower() == 'female':
+            self.click(self.GENDER_FEMALE)
+        elif gender.lower() == 'other':
+            self.click(self.GENDER_OTHER)
+        else:
+            raise ValueError(f"Некорректное значение пола: '{gender}'."
+                             f" Допустимые значения: 'male', 'female', 'other'")
+
+        return self
+
+    def fill_number(self, number="5555555555"):
+        str_number = str(number)
+        if len(str(number)) == 10:
+            self.fill(self.USER_NUMBER, number)
+        else:
+            print(f"WARNING: Номер {number} имеет {len(str_number)} цифр (должно быть 10)")
+            self.fill(self.USER_NUMBER, str_number)
