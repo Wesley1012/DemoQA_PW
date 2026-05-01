@@ -3,10 +3,12 @@ from pages.basepage import BasePage
 from locators.elements_locators import *
 from playwright.sync_api import expect
 from dotenv import load_dotenv
+from faker import Faker
 import allure
 import os
 
 load_dotenv()
+fake = Faker()
 
 class FormsPage(BasePage):
     def __init__(self, page):
@@ -38,13 +40,22 @@ class FormsPage(BasePage):
         self.fill(self.FIRST_NAME, first_name)
         return self
 
+    def get_first_name(self):
+        return self.get_input_value(self.FIRST_NAME)
+
     def fill_last_name(self, last_name: str):
         self.fill(self.LAST_NAME, last_name)
         return self
 
+    def get_last_name(self):
+        return self.get_input_value(self.LAST_NAME)
+
     def fill_email(self, email: str):
         self.fill(self.USER_EMAIL, email)
         return self
+
+    def get_email(self):
+        return self.get_input_value(self.USER_EMAIL)
 
     def choose_gender(self, gender="male"):
         if gender.lower() == 'male':
@@ -66,3 +77,19 @@ class FormsPage(BasePage):
         else:
             print(f"WARNING: Номер {number} имеет {len(str_number)} цифр (должно быть 10)")
             self.fill(self.USER_NUMBER, str_number)
+
+    def get_number(self):
+        return self.get_input_value(self.USER_NUMBER)
+
+    def fill_data(self, day = "01",
+                        month = "May",
+                        year = "2026"):
+        date = " ".join((day, month, year))
+        link = self.locator(self.DATE_OF_BIRTH)
+        link.fill(date)
+
+        return self
+
+    def get_data(self) -> str:
+        form_input = self.locator(self.DATE_OF_BIRTH)
+        return form_input.get_attribute('value')

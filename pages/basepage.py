@@ -35,6 +35,9 @@ class BasePage:
     def get_current_url(self) -> str:
         return self.page.url
 
+    def get_input_value(self, selector):
+        return self.page.input_value(selector)
+
     def get_title(self):
         return self.page.title()
 
