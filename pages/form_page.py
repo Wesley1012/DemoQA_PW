@@ -36,6 +36,8 @@ class FormsPage(BasePage):
     CITY_SELECT = "#city"
     SUBMIT_BTN = "#submit"
 
+
+    #First name
     def fill_first_name(self, first_name: str):
         self.fill(self.FIRST_NAME, first_name)
         return self
@@ -43,6 +45,7 @@ class FormsPage(BasePage):
     def get_first_name(self):
         return self.get_input_value(self.FIRST_NAME)
 
+    #Last name
     def fill_last_name(self, last_name: str):
         self.fill(self.LAST_NAME, last_name)
         return self
@@ -50,6 +53,7 @@ class FormsPage(BasePage):
     def get_last_name(self):
         return self.get_input_value(self.LAST_NAME)
 
+    #Mail
     def fill_email(self, email: str):
         self.fill(self.USER_EMAIL, email)
         return self
@@ -57,6 +61,7 @@ class FormsPage(BasePage):
     def get_email(self):
         return self.get_input_value(self.USER_EMAIL)
 
+    #Gender
     def choose_gender(self, gender="male"):
         if gender.lower() == 'male':
             self.click(self.GENDER_MALE)
@@ -70,6 +75,17 @@ class FormsPage(BasePage):
 
         return self
 
+    def get_checked_gender(self) -> str:
+        if self.page.is_checked(self.GENDER_MALE):
+            return "Male"
+        elif self.page.is_checked(self.GENDER_FEMALE):
+            return "Female"
+        elif self.page.is_checked(self.GENDER_OTHER):
+            return "Other"
+        return None
+
+
+    #Fill number
     def fill_number(self, number="5555555555"):
         str_number = str(number)
         if len(str(number)) == 10:
@@ -81,6 +97,7 @@ class FormsPage(BasePage):
     def get_number(self):
         return self.get_input_value(self.USER_NUMBER)
 
+    #Data
     def fill_data(self, day = "01",
                         month = "May",
                         year = "2026"):
@@ -93,3 +110,21 @@ class FormsPage(BasePage):
     def get_data(self) -> str:
         form_input = self.locator(self.DATE_OF_BIRTH)
         return form_input.get_attribute('value')
+
+    #Subjects
+    def fill_subject(self, input_sub):
+        self.page.fill(self.SUBJECTS, input_sub)
+        return self
+
+
+
+    def subjects(self) -> bool:
+        try:
+            aria_expanded = self.page.get_attribute("#subjectsInput",
+                                                    "aria-expanded") == 'true'
+            options = self.page.locator(".subjects-auto-complete__option")
+            has_options = options.count() > 0 and options.first.is_visible()
+            print(options.count())
+            return aria_expanded and has_options
+        except:
+            return False
