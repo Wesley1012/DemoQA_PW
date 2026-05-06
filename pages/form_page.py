@@ -124,7 +124,40 @@ class FormsPage(BasePage):
                                                     "aria-expanded") == 'true'
             options = self.page.locator(".subjects-auto-complete__option")
             has_options = options.count() > 0 and options.first.is_visible()
-            print(options.count())
+            print("\n", options.count())
             return aria_expanded and has_options
         except:
             return False
+
+    def get_option(self):
+        option = self.locator(".subjects-auto-complete__option")
+        return option.text_content()
+
+    def get_all_options(self):
+        option = self.page.locator(".subjects-auto-complete__option")
+        option.first.wait_for(state="attached", timeout=5000)
+        return option.all_text_contents()
+
+    def fill_all_letters_and_get_options(self):
+        try:
+            options_set = set()
+
+            for i in 'abcdefghijklmnopqrstuvwxyz':
+                self.fill(self.SUBJECTS, i)
+                self.page.wait_for_timeout(200)
+
+                options = self.page.locator(".subjects-auto-complete__option")
+                if options.count():
+                    all_options = options.all_text_contents()
+                    print(f"\n({i}, {all_options}),")
+                    options_set.update(all_options)
+                else:
+                    print(f"\n({i}, 'Nothing to output'),")
+
+            print(f'\nLen :{len(options_set)}\n{options_set}')
+            return options_set
+        except Exception as ex:
+            print(f"\nEXCEPTION: {ex}")
+
+
+
