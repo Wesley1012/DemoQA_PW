@@ -4,8 +4,8 @@
 [![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://python.org/)
 
-Автоматические тесты для [demoqa.com](https://demoqa.com) — учебного сайта для отработки навыков тестирования веб-форм и элементов интерфейса.  
-Проверяем работу полей ввода, чекбоксов, кнопок и других элементов.
+Автоматические тесты для [demoqa.com](https://demoqa.com) — сайта для отработки навыков тестирования веб-форм и элементов интерфейса.  
+Проверяем работу форм, полей ввода, чекбоксов, кнопок и других элементов.
 
 ### Возможности
 - Page Object Model — чистая архитектура и переиспользование кода
@@ -63,4 +63,20 @@ pytest
 ### Запуск с генерацией Allure отчёта(addopts уже прописан см. pytest.ini)
 
 pytest --alluredir=allure-results
-allure serve allure-results # или npx allure serve allure-results в моём случае
+allure serve allure-results 
+#### или
+npx allure serve allure-results 
+
+## Docker(Браузер в контейнере запускается в headless режиме см. conftest.py)
+
+### Сборка образа
+
+docker build -t demoqa_wp .
+
+### Запуск тестов
+
+docker run --rm demoqa_wp
+
+## Запуск тестов с сохранением результатов
+docker run --rm -v $(pwd)/allure-results:/app/allure-results demoqa_wp
+
