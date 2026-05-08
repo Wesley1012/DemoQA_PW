@@ -62,3 +62,8 @@ class TestSubjects(TestForms):
     def test_all_letter(self, letter, option_input):
         self.page.fill_subject(letter)
         assert self.page.get_all_options() == option_input
+
+
+
+    def test_tool(self, text='english'):
+        print(self.page._get_remove_btn_by_text(text))

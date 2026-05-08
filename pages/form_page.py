@@ -116,6 +116,19 @@ class FormsPage(BasePage):
         self.page.fill(self.SUBJECTS, input_sub)
         return self
 
+    def _get_remove_btn_by_text(self, text: str):
+        self.fill(self.SUBJECTS, text)
+        options = self.page.locator(".subjects-auto-complete__option")
+        options.first.click()
+
+        values = self.locator('.subjects-auto-complete__multi-value')
+        try:
+            for i in values:
+                if i.text_content() == text.title():
+                    print("\n", i.text_content(), "\n", text.title())
+            return f'"\n{i.text_content()}\n {text.title()}'
+        except:
+            pass
 
 
     def subjects(self) -> bool:
