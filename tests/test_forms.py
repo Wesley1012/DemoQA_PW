@@ -65,5 +65,21 @@ class TestSubjects(TestForms):
 
 
 
-    def test_tool(self, text='english'):
-        print(self.page._get_remove_btn_by_text(text))
+    # def test_tool(self, text='english'):
+    #     self.page.remove_subject_by_text(text)
+
+    def test_adds_and_delete_all_options(self):
+        options = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
+                   'Computer Science', 'Social Studies', 'Accounting', 'Maths',
+                   'Hindi', 'History', 'Civics', 'Biology', 'Physics')
+
+        for option in options:
+            self.page.fill_subject(option)
+
+            assert self.page.get_last_subject() == option
+
+
+    def test_get_last_sub(self):
+        self.page.fill_subject('english')
+
+        assert self.page.get_last_subject() == 'English'

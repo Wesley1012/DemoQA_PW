@@ -114,21 +114,22 @@ class FormsPage(BasePage):
     #Subjects
     def fill_subject(self, input_sub):
         self.page.fill(self.SUBJECTS, input_sub)
+        option = self.page.locator(".subjects-auto-complete__option")
+        option.first.click()
+        self.page.wait_for_timeout(200)
         return self
 
-    def _get_remove_btn_by_text(self, text: str):
-        self.fill(self.SUBJECTS, text)
-        options = self.page.locator(".subjects-auto-complete__option")
-        options.first.click()
-
-        values = self.locator('.subjects-auto-complete__multi-value')
+    def remove_subject_by_text(self, text: str):
         try:
-            for i in values:
-                if i.text_content() == text.title():
-                    print("\n", i.text_content(), "\n", text.title())
-            return f'"\n{i.text_content()}\n {text.title()}'
-        except:
-            pass
+            self.fill(self.SUBJECTS, text)
+            options = self.page.locator(".subjects-auto-complete__option")
+            options.first.click()
+
+            remove_btn = self.locator(f".subjects-auto-complete__multi-value__remove[aria-label='Remove {text.title()}']")
+            remove_btn.click()
+            return self
+        except Exception as ex:
+            print(f'Exception: {ex}')
 
 
     def subjects(self) -> bool:
@@ -145,6 +146,10 @@ class FormsPage(BasePage):
     def get_option(self):
         option = self.locator(".subjects-auto-complete__option")
         return option.text_content()
+
+    def get_last_subject(self):
+        subject = self.locator(".subjects-auto-complete__multi-value__label").last()
+        return subject.text_content()
 
     def get_all_options(self):
         option = self.page.locator(".subjects-auto-complete__option")
