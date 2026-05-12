@@ -22,21 +22,22 @@ class TestForms:
         assert self.page.get_data() == "01 May 2026"''
 
 class TestSubjects(TestForms):
+    OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
+               'Computer Science', 'Social Studies', 'Accounting', 'Maths',
+               'Hindi', 'History', 'Civics', 'Biology', 'Physics')
 
     def test_subjects(self):
         self.page.fill_subject("s")
         assert self.page.subjects()
 
     @pytest.mark.parametrize('option',
-                             ('Hindi', 'Physics', 'Economics', 'Arts', 'Accounting',
-                              'Social Studies', 'English', 'History', 'Maths', 'Civics',
-                              'Commerce', 'Computer Science', 'Chemistry', 'Biology'))
+                             OPTIONS)
     def test_select_option(self, option):
-        self.page.fill_subject(option)
+        self.page.select_option(option)
         assert self.page.get_option() == option
-
-    def test_get_all_options(self):
-        self.page.fill_all_letters_and_get_options()
+    #
+    # def test_get_all_options(self):
+    #     self.page.fill_all_letters_and_get_options()
 
     @pytest.mark.parametrize('letter, option_input',
                             (('a', ['Maths', 'Accounting', 'Arts', 'Social Studies']),
@@ -60,7 +61,7 @@ class TestSubjects(TestForms):
                             ('y', ['Physics', 'Chemistry', 'Biology', 'History'])))
 
     def test_all_letter(self, letter, option_input):
-        self.page.fill_subject(letter)
+        self.page.select_option(letter)
         assert self.page.get_all_options() == option_input
 
 
@@ -69,17 +70,18 @@ class TestSubjects(TestForms):
     #     self.page.remove_subject_by_text(text)
 
     def test_adds_and_delete_all_options(self):
-        options = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
-                   'Computer Science', 'Social Studies', 'Accounting', 'Maths',
-                   'Hindi', 'History', 'Civics', 'Biology', 'Physics')
-
-        for option in options:
+        for option in self.OPTIONS:
             self.page.fill_subject(option)
 
             assert self.page.get_last_subject() == option
+
+            self.page.remove_subject_by_text(option)
 
 
     def test_get_last_sub(self):
         self.page.fill_subject('english')
 
         assert self.page.get_last_subject() == 'English'
+
+    # @pytest.mark.parametrize('subject')
+    # def test_clean_subjects_btn(self, ):

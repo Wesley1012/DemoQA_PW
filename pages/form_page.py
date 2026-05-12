@@ -112,12 +112,32 @@ class FormsPage(BasePage):
         return form_input.get_attribute('value')
 
     #Subjects
-    def fill_subject(self, input_sub):
-        self.page.fill(self.SUBJECTS, input_sub)
-        option = self.page.locator(".subjects-auto-complete__option")
-        option.first.click()
-        self.page.wait_for_timeout(200)
+
+    def select_option(self, input_option):
+        self.page.fill(self.SUBJECTS, input_option)
+        self.page.wait_for_selector(selector=".subjects-auto-complete__option",
+                                    state='visible',
+                                    timeout=500
+                                    )
         return self
+
+    def fill_subject(self, input_sub):
+
+        self.fill(self.SUBJECTS, input_sub)
+        option = self.page.locator(".subjects-auto-complete__option")
+        self.page.wait_for_timeout(500)
+        option.first.click()
+        expect(
+            self.page.locator(f".subjects-auto-complete__multi-value__label:has-text('{input_sub}')")).to_be_visible()
+
+        return self
+
+
+    def get_last_subject(self):
+        subject = self.locator(".subjects-auto-complete__multi-value__label")
+        subject.last.wait_for(state="attached", timeout=500)
+        print('\n', subject.count(), '\n', subject.text_content())
+        return subject.nth(-1).text_content()
 
     def remove_subject_by_text(self, text: str):
         try:
@@ -147,9 +167,6 @@ class FormsPage(BasePage):
         option = self.locator(".subjects-auto-complete__option")
         return option.text_content()
 
-    def get_last_subject(self):
-        subject = self.locator(".subjects-auto-complete__multi-value__label").last()
-        return subject.text_content()
 
     def get_all_options(self):
         option = self.page.locator(".subjects-auto-complete__option")
@@ -177,5 +194,8 @@ class FormsPage(BasePage):
         except Exception as ex:
             print(f"\nEXCEPTION: {ex}")
 
-
+    def clear_subjects(self):
+        clear_btn = self.locator(".subjects-auto-complete__indicator")
+        clear_btn.click()
+        return self
 
