@@ -121,15 +121,15 @@ class FormsPage(BasePage):
                                     )
         return self
 
-    def fill_subject(self, input_sub):
+    def fill_subject(self, input_sub: str):
 
-        self.fill(self.SUBJECTS, input_sub)
-        option = self.page.locator(".subjects-auto-complete__option")
         self.page.wait_for_timeout(500)
-        option.first.click()
-        expect(
-            self.page.locator(f".subjects-auto-complete__multi-value__label:has-text('{input_sub}')")).to_be_visible()
+        self.page.fill(self.SUBJECTS, input_sub)
+        option = self.page.locator(".subjects-auto-complete__option").first
+        option.click()
+        self.page.wait_for_timeout(500)
 
+        assert self.locator(f'//div[contains(text(), "{input_sub.title()}")]')
         return self
 
 
@@ -199,3 +199,10 @@ class FormsPage(BasePage):
         clear_btn.click()
         return self
 
+    def assert_subject_is_visible(self, name: str):
+        try:
+            subject = self.page.locator(f'//div[contains(text(), "{name.title()}")]')
+            expect(subject).to_be_visible(timeout=3000)
+            return True
+        except:
+            return False

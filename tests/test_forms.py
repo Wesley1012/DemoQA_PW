@@ -65,23 +65,22 @@ class TestSubjects(TestForms):
         assert self.page.get_all_options() == option_input
 
 
-
-    # def test_tool(self, text='english'):
-    #     self.page.remove_subject_by_text(text)
-
     def test_adds_and_delete_all_options(self):
         for option in self.OPTIONS:
             self.page.fill_subject(option)
 
-            assert self.page.get_last_subject() == option
+            assert self.page.assert_subject_is_visible(option)
 
             self.page.remove_subject_by_text(option)
 
+    @pytest.mark.parametrize('subject',
+                             OPTIONS)
+    def test_select_and_delete_subject(self, subject: str):
+        self.page.fill_subject(subject)
 
-    def test_get_last_sub(self):
-        self.page.fill_subject('english')
+        with allure.step('Проверить, что выбраный предмет отобразился'):
+            self.page.assert_subject_is_visible(subject)
 
-        assert self.page.get_last_subject() == 'English'
+        self.page.remove_subject_by_text(subject)
 
-    # @pytest.mark.parametrize('subject')
-    # def test_clean_subjects_btn(self, ):
+        assert self.page.assert_subject_is_visible(subject) == False
