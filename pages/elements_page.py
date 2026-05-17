@@ -18,10 +18,10 @@ class TextBoxPage(ElementsPage):
 
     @allure.step('Заполнить все поля значениями и подтвердить')
     def fill_form_text_box(self,
-                           name,
-                           email,
-                           current_address,
-                           permanent_address):
+                           name="John Smith",
+                           email="test@test.com",
+                           current_address="Current Address",
+                           permanent_address="Permanent Address"):
         self.fill(TextBoxLocators.FULL_NAME, name)
         self.fill(TextBoxLocators.EMAIL, email)
         self.fill(TextBoxLocators.CURRENT_ADDRESS, current_address)
@@ -40,6 +40,9 @@ class TextBoxPage(ElementsPage):
         assert self.get_text("#output #email").replace("Email:", "").strip() == email
         assert self.get_text("#output #currentAddress").replace("Current Address :", "").strip() == current_address
         assert self.get_text("#output #permanentAddress").replace("Permananet Address :", "").strip() == permanent_address
+
+    def get_name_input(self):
+        return self.get_text(".text-field-container #output #name").replace("Name:", "").strip()
 
     def get_element_title(self):
         return self.get_text('.text-center')

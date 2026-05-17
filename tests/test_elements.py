@@ -4,7 +4,9 @@ from locators.elements_locators import *
 import allure
 from faker import Faker
 import pytest
+import asyncio
 from time import sleep
+import json
 
 random_age = str(random.randint(1, 100))
 random_salary = str(random.randint(1, 10))+"000"
@@ -16,6 +18,9 @@ class TestTextBox:
     def setup_method(self, page, auto_screenshot):
         self.page = TextBoxPage(page)
         self.page.navigate('text-box')
+
+    with open('test_data/blns.json', 'r', encoding='utf-8') as f:
+        naughty_strings = json.load(f)
 
     @allure.title("Форма Text Box")
     @pytest.mark.parametrize(
@@ -33,7 +38,13 @@ class TestTextBox:
                                              email,
                                              current_address,
                                              permanent_address)
-            
+
+    @pytest.mark.parametrize('string', naughty_strings)
+    def test_name_input(self, string):
+            self.page.fill_form_text_box(name=string)
+
+            assert self.page.get_name_input() == string
+
 @allure.title("Форма Check Box и навигация")
 class TestCheckBox:
     @pytest.fixture(autouse=True)
