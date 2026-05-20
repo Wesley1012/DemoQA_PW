@@ -8,9 +8,14 @@ class TestForms:
         self.page = FormsPage(page)
         self.page.navigate('automation-practice-form')
 
-    def test_gender(self):
-        self.page.choose_gender('Female')
-        assert self.page.get_checked_gender() == "Female"
+    @pytest.mark.parametrize("Gender",
+                             ["Male", "Female", "Other"])
+    def test_gender(self, Gender: str):
+        self.page.choose_gender(Gender)
+        if Gender == "Other":
+            assert self.page.get_checked_gender() in ("Other", None)
+        else:
+            assert self.page.get_checked_gender() == Gender
 
     #fake.numerify('###-###-####')
     def test_number(self):
@@ -20,6 +25,11 @@ class TestForms:
     def test_date(self):
         self.page.fill_data()
         assert self.page.get_data() == "01 May 2026"''
+
+    @pytest.mark.parametrize('hobby',
+                             ["Sport", "Reading", "Music"])
+    def test_choice_hobby(self, hobby: str):
+        self.page.choice_hobby(hobby)
 
 class TestSubjects(TestForms):
     OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',

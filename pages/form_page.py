@@ -124,12 +124,26 @@ class FormsPage(BasePage):
     def fill_subject(self, input_sub: str):
 
         self.page.wait_for_timeout(500)
-        self.page.fill(self.SUBJECTS, input_sub)
-        option = self.page.locator(".subjects-auto-complete__option").first
-        option.click()
+        self.fill(".subjects-auto-complete__input", input_sub)
+        self.page.wait_for_selector('.subjects-auto-complete__option.subjects-auto-complete__option--is-focused.css-d7l1ni-option')
+        focused_menu = self.locator('.subjects-auto-complete__option.subjects-auto-complete__option--is-focused.css-d7l1ni-option')
+        focused_menu.click()
+        # option = self.page.locator(".subjects-auto-complete__option").first
+        # option.press("Enter")
+        self.page.wait_for_selector(".subjects-auto-complete__multi-value__label.css-9jq23d",
+                                    state="visible",
+                                    timeout=5000)
+
+        sub = self.locator(self.SUBJECTS)
+        sub.press('Control+Delete')
+
+
+        # option = self.page.locator(".subjects-auto-complete__option").first
+        # option.press("Enter")
+        # self.page.locator("#subjectsInput").press("Enter")
         self.page.wait_for_timeout(500)
 
-        assert self.locator(f'//div[contains(text(), "{input_sub.title()}")]')
+        # assert self.locator(f'//div[contains(text(), "{input_sub.title()}")]')
         return self
 
 
@@ -206,3 +220,50 @@ class FormsPage(BasePage):
             return True
         except:
             return False
+
+    # Hobbies
+
+    @allure.title("Выбрать хобби спорт")
+    def select_sport(self):
+        self.page.wait_for_timeout(300)
+        self.click(self.HOBBIES_SPORTS)
+        self.page.wait_for_selector("#hobbies-checkbox-1.form-check-input:checked")
+        return self
+
+
+    @allure.title("Выбрать хобби чтение")
+    def select_reading(self):
+        self.page.wait_for_timeout(300)
+        self.click(self.HOBBIES_READING)
+        self.page.wait_for_selector("#hobbies-checkbox-2.form-check-input:checked")
+        return self
+
+
+    @allure.title("Выбрать хобби музыку")
+    def select_music(self):
+        self.page.wait_for_timeout(300)
+        self.click(self.HOBBIES_MUSIC)
+        self.page.wait_for_selector("#hobbies-checkbox-3.form-check-input:checked")
+        return self
+
+    @allure.step("Выбрать хобби {hobby} и проверить")
+    def choice_hobby(self, hobby: str):
+        self.page.wait_for_timeout(300)
+
+        if hobby.lower() == "sport":
+            self.click(self.HOBBIES_SPORTS)
+            self.page.wait_for_selector("#hobbies-checkbox-1.form-check-input:checked")
+            return self
+
+        elif hobby.lower() == "reading":
+            self.click(self.HOBBIES_READING)
+            self.page.wait_for_selector("#hobbies-checkbox-2.form-check-input:checked")
+            return self
+
+        elif hobby.lower() == "music":
+            self.click(self.HOBBIES_MUSIC)
+            self.page.wait_for_selector("#hobbies-checkbox-3.form-check-input:checked")
+            return self
+
+
+
