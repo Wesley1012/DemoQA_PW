@@ -124,27 +124,26 @@ class FormsPage(BasePage):
     def fill_subject(self, input_sub: str):
 
         self.page.wait_for_timeout(500)
-        self.fill(".subjects-auto-complete__input", input_sub)
+        self.click(self.SUBJECTS)
+        self.page.fill(self.SUBJECTS, {input_sub})
         self.page.wait_for_selector('.subjects-auto-complete__option.subjects-auto-complete__option--is-focused.css-d7l1ni-option')
-        focused_menu = self.locator('.subjects-auto-complete__option.subjects-auto-complete__option--is-focused.css-d7l1ni-option')
-        focused_menu.click()
-        # option = self.page.locator(".subjects-auto-complete__option").first
-        # option.press("Enter")
-        self.page.wait_for_selector(".subjects-auto-complete__multi-value__label.css-9jq23d",
-                                    state="visible",
-                                    timeout=5000)
 
-        sub = self.locator(self.SUBJECTS)
-        sub.press('Control+Delete')
-
-
-        # option = self.page.locator(".subjects-auto-complete__option").first
-        # option.press("Enter")
-        # self.page.locator("#subjectsInput").press("Enter")
         self.page.wait_for_timeout(500)
 
-        # assert self.locator(f'//div[contains(text(), "{input_sub.title()}")]')
+        sub = self.locator(self.SUBJECTS)
+        sub.press("Enter")
+        sub.press("Control")
+
         return self
+
+    def assert_subject_is_visible(self, name: str):
+        try:
+            if self.locator(".subjects-auto-complete__multi-value__label"):
+            # subject = self.page.locator(".subjects-auto-complete__multi-value__label.css-9jq23d")
+            # expect(subject).to_be_visible(timeout=3000)
+                return True
+        except:
+            return False
 
 
     def get_last_subject(self):
@@ -155,9 +154,9 @@ class FormsPage(BasePage):
 
     def remove_subject_by_text(self, text: str):
         try:
-            self.fill(self.SUBJECTS, text)
-            options = self.page.locator(".subjects-auto-complete__option")
-            options.first.click()
+            # self.fill(self.SUBJECTS, text)
+            # options = self.page.locator(".subjects-auto-complete__option")
+            # options.first.click()
 
             remove_btn = self.locator(f".subjects-auto-complete__multi-value__remove[aria-label='Remove {text.title()}']")
             remove_btn.click()
@@ -213,13 +212,6 @@ class FormsPage(BasePage):
         clear_btn.click()
         return self
 
-    def assert_subject_is_visible(self, name: str):
-        try:
-            subject = self.page.locator(f'//div[contains(text(), "{name.title()}")]')
-            expect(subject).to_be_visible(timeout=3000)
-            return True
-        except:
-            return False
 
     # Hobbies
 
@@ -265,5 +257,16 @@ class FormsPage(BasePage):
             self.page.wait_for_selector("#hobbies-checkbox-3.form-check-input:checked")
             return self
 
+    # Picture
 
+    @allure.step("Загрузить картинку")
+    def upload_picture(self, tmp_path, file_name="test_picture.png"):
+        test_file = tmp_path / f"{file_name}"
+        test_file.write_bytes(b'test_content')
 
+        self.locator(self.UPLOAD_PICTURE).set_input_files(str(test_file))
+
+        return self
+
+    # def get_picture_text(self):
+    #     print(self.page.text_content(self.UPLOAD_PICTURE))

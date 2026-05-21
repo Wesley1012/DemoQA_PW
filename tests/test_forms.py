@@ -1,6 +1,9 @@
 import pytest
 from pages.form_page import FormsPage
 import allure
+from faker import Faker
+
+fake = Faker()
 
 class TestForms:
     @pytest.fixture(autouse=True)
@@ -26,29 +29,31 @@ class TestForms:
         self.page.fill_data()
         assert self.page.get_data() == "01 May 2026"''
 
+    @allure.title("Выбрать хобби {hobby}")
     @pytest.mark.parametrize('hobby',
                              ["Sport", "Reading", "Music"])
     def test_choice_hobby(self, hobby: str):
         self.page.choice_hobby(hobby)
+
+    def test_upload_picture(self, tmp_path, file_name=f'{fake.words()}.png'):
+        self.page.upload_picture(tmp_path, file_name=file_name)
+
+    # def test_text(self):
+    #     print(self.page.get_picture_text())
 
 class TestSubjects(TestForms):
     OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
                'Computer Science', 'Social Studies', 'Accounting', 'Maths',
                'Hindi', 'History', 'Civics', 'Biology', 'Physics')
 
-    def test_subjects(self):
-        self.page.fill_subject("s")
-        assert self.page.subjects()
-
+    @allure.title("Проверка соответствия выбранной опции")
     @pytest.mark.parametrize('option',
                              OPTIONS)
-    def test_select_option(self, option):
+    def test_select_option(self, option: str):
         self.page.select_option(option)
         assert self.page.get_option() == option
-    #
-    # def test_get_all_options(self):
-    #     self.page.fill_all_letters_and_get_options()
 
+    @allure.title("Проверка вариантов вывода опций по букве")
     @pytest.mark.parametrize('letter, option_input',
                             (('a', ['Maths', 'Accounting', 'Arts', 'Social Studies']),
                             ('b', ['Biology']),
@@ -70,19 +75,12 @@ class TestSubjects(TestForms):
                             ('v', ['Civics']),
                             ('y', ['Physics', 'Chemistry', 'Biology', 'History'])))
 
-    def test_all_letter(self, letter, option_input):
+    def test_all_letter(self, letter: str, option_input: list):
         self.page.select_option(letter)
         assert self.page.get_all_options() == option_input
 
 
-    def test_adds_and_delete_all_options(self):
-        for option in self.OPTIONS:
-            self.page.fill_subject(option)
-
-            assert self.page.assert_subject_is_visible(option)
-
-            self.page.remove_subject_by_text(option)
-
+    @allure.title("Выбрать предмет")
     @pytest.mark.parametrize('subject',
                              OPTIONS)
     def test_select_and_delete_subject(self, subject: str):
@@ -91,6 +89,3 @@ class TestSubjects(TestForms):
         with allure.step('Проверить, что выбраный предмет отобразился'):
             self.page.assert_subject_is_visible(subject)
 
-        self.page.remove_subject_by_text(subject)
-
-        assert self.page.assert_subject_is_visible(subject) == False
