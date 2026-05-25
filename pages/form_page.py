@@ -270,3 +270,12 @@ class FormsPage(BasePage):
 
     # def get_picture_text(self):
     #     print(self.page.text_content(self.UPLOAD_PICTURE))
+
+    @allure.step("Звполнить адрес")
+    def fill_address(self, text):
+        self.fill(self.CURRENT_ADDRESS, text)
+        return self
+
+    def get_address(self):
+        text = self.locator('#currentAddress').input_value()
+        return text

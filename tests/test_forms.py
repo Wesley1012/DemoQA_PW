@@ -41,6 +41,11 @@ class TestForms:
     # def test_text(self):
     #     print(self.page.get_picture_text())
 
+    @allure.title("Заполнить адрес")
+    def test_fill_current_address(self, text=fake.address()):
+        self.page.fill_address(text)
+        assert self.page.get_address() == text
+
 class TestSubjects(TestForms):
     OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
                'Computer Science', 'Social Studies', 'Accounting', 'Maths',
