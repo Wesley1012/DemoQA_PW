@@ -11,6 +11,7 @@ class TestForms:
         self.page = FormsPage(page)
         self.page.navigate('automation-practice-form')
 
+
     @pytest.mark.parametrize("Gender",
                              ["Male", "Female", "Other"])
     def test_gender(self, Gender: str):
@@ -21,13 +22,24 @@ class TestForms:
             assert self.page.get_checked_gender() == Gender
 
     #fake.numerify('###-###-####')
-    def test_number(self):
-        self.page.fill_number("4444444444")
-        assert self.page.get_number() == "4444444444"
+    @allure.title("Ввести номер телефона")
+    @pytest.mark.parametrize('number',
+                             [fake.numerify("##########"),
+                              "0000000000",
+                              "9999999999"])
+    def test_number(self, number: str):
+        self.page.fill_number(number)
+        with allure.step("Проверить, что номер отобразился корректно"):
+            assert self.page.get_number() == number
 
-    def test_date(self):
+
+    @allure.title("Ввести дату")
+    @pytest.mark.parametrize("day, month, year",
+                             [(fake.day_of_month(), fake.month_name(), fake.year())])
+    def test_date(self, day: str, month: str, year: str):
         self.page.fill_data()
         assert self.page.get_data() == "01 May 2026"''
+
 
     @allure.title("Выбрать хобби {hobby}")
     @pytest.mark.parametrize('hobby',
@@ -35,16 +47,19 @@ class TestForms:
     def test_choice_hobby(self, hobby: str):
         self.page.choice_hobby(hobby)
 
-    def test_upload_picture(self, tmp_path, file_name=f'{fake.words()}.png'):
-        self.page.upload_picture(tmp_path, file_name=file_name)
 
-    # def test_text(self):
-    #     print(self.page.get_picture_text())
+    @allure.title("Загрузить фото")
+    def test_upload_picture(self, tmp_path, file_name=f'{fake.word()}.png'):
+        self.page.upload_picture(tmp_path, file_name=file_name)
+        with allure.step('Проверть, что путь соответствует загруженному файлу'):
+            assert self.page.get_picture_path() == f"C:\\fakepath\\{file_name}"
+
 
     @allure.title("Заполнить адрес")
     def test_fill_current_address(self, text=fake.address()):
         self.page.fill_address(text)
         assert self.page.get_address() == text
+
 
 class TestSubjects(TestForms):
     OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
@@ -60,7 +75,7 @@ class TestSubjects(TestForms):
 
     @allure.title("Проверка вариантов вывода опций по букве")
     @pytest.mark.parametrize('letter, option_input',
-                            (('a', ['Maths', 'Accounting', 'Arts', 'Social Studies']),
+                            [('a', ['Maths', 'Accounting', 'Arts', 'Social Studies']),
                             ('b', ['Biology']),
                             ('c', ['Physics', 'Chemistry', 'Computer Science', 'Commerce', 'Accounting', 'Economics', 'Social Studies', 'Civics']),
                             ('d', ['Hindi', 'Social Studies']),
@@ -78,7 +93,7 @@ class TestSubjects(TestForms):
                             ('t', ['Maths', 'Chemistry', 'Computer Science', 'Accounting', 'Arts', 'Social Studies', 'History']),
                             ('u', ['Computer Science', 'Accounting', 'Social Studies']),
                             ('v', ['Civics']),
-                            ('y', ['Physics', 'Chemistry', 'Biology', 'History'])))
+                            ('y', ['Physics', 'Chemistry', 'Biology', 'History'])])
 
     def test_all_letter(self, letter: str, option_input: list):
         self.page.select_option(letter)

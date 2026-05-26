@@ -91,7 +91,7 @@ class FormsPage(BasePage):
         if len(str(number)) == 10:
             self.fill(self.USER_NUMBER, number)
         else:
-            print(f"WARNING: Номер {number} имеет {len(str_number)} цифр (должно быть 10)")
+            print(f"\nWARNING: Номер {number} имеет {len(str_number)} цифр (должно быть 10)")
             self.fill(self.USER_NUMBER, str_number)
 
     def get_number(self):
@@ -263,13 +263,13 @@ class FormsPage(BasePage):
     def upload_picture(self, tmp_path, file_name="test_picture.png"):
         test_file = tmp_path / f"{file_name}"
         test_file.write_bytes(b'test_content')
-
         self.locator(self.UPLOAD_PICTURE).set_input_files(str(test_file))
 
         return self
 
-    # def get_picture_text(self):
-    #     print(self.page.text_content(self.UPLOAD_PICTURE))
+    def get_picture_path(self):
+        text = self.locator(self.UPLOAD_PICTURE).input_value()
+        return text
 
     @allure.step("Звполнить адрес")
     def fill_address(self, text):
@@ -279,3 +279,6 @@ class FormsPage(BasePage):
     def get_address(self):
         text = self.locator('#currentAddress').input_value()
         return text
+
+    def select_state(self, state):
+        self.click(self.STATE_SELECT)
