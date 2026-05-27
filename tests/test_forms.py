@@ -60,6 +60,13 @@ class TestForms:
         self.page.fill_address(text)
         assert self.page.get_address() == text
 
+    @allure.title("Выбор штата и города")
+    def test_state_and_city(self, state: str, city: str):
+        self.page.select_state_and_city(state, city)
+        with allure.step('Проверить, что штат и город совпадают'):
+            assert self.page.get_selected_state() == state, f"Штат не совпадает с выбранным: {state}"
+            assert self.page.get_selected_city() == city, f"Город не совпадает с выбранным: {city}"
+
 
 class TestSubjects(TestForms):
     OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',

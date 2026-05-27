@@ -99,8 +99,8 @@ class FormsPage(BasePage):
 
     #Data
     def fill_data(self, day = "01",
-                        month = "May",
-                        year = "2026"):
+                  month = "May",
+                  year = "2026"):
         date = " ".join((day, month, year))
         link = self.locator(self.DATE_OF_BIRTH)
         link.fill(date)
@@ -139,8 +139,8 @@ class FormsPage(BasePage):
     def assert_subject_is_visible(self, name: str):
         try:
             if self.locator(".subjects-auto-complete__multi-value__label"):
-            # subject = self.page.locator(".subjects-auto-complete__multi-value__label.css-9jq23d")
-            # expect(subject).to_be_visible(timeout=3000)
+                # subject = self.page.locator(".subjects-auto-complete__multi-value__label.css-9jq23d")
+                # expect(subject).to_be_visible(timeout=3000)
                 return True
         except:
             return False
@@ -271,6 +271,8 @@ class FormsPage(BasePage):
         text = self.locator(self.UPLOAD_PICTURE).input_value()
         return text
 
+    # Address
+
     @allure.step("Звполнить адрес")
     def fill_address(self, text):
         self.fill(self.CURRENT_ADDRESS, text)
@@ -280,5 +282,61 @@ class FormsPage(BasePage):
         text = self.locator('#currentAddress').input_value()
         return text
 
-    def select_state(self, state):
+    # State and city
+
+    def select_state_and_city(self, state: str, city: str):
         self.click(self.STATE_SELECT)
+        if state.lower() == "ncr":
+            self.click("#state #react-select-3-option-0")
+            self.click("#city")
+            if city.lower() == "delhi":
+                self.click("#city #react-select-4-option-0")
+            elif city.lower() == "gurgaon":
+                self.click("#city #react-select-4-option-1")
+            elif city.lower() == "noida":
+                self.click("#city #react-select-4-option-2")
+            else:
+                raise f"NCR dont have city: {city}"
+
+        elif state.lower() == "uttar Pradesh":
+            self.click("#state #react-select-4-option-0")
+            self.click("#city")
+            if city.lower() == "agra":
+                self.click("#city #react-select-4-option-0")
+            elif city.lower() == "lucknow":
+                self.click("#city #react-select-4-option-1")
+            elif city.lower() == "merrut":
+                self.click("#city #react-select-4-option-2")
+            else:
+                raise Exception(f"Uttar Pradesh dont have city: {city}")
+
+        elif state.lower() == "haryana":
+            self.click("#state #react-select-3-option-2")
+            self.click("#city")
+            if city.lower() == "karnal":
+                self.click("#city #react-select-4-option-0")
+            elif city.lower() == "panipat":
+                self.click("#city #react-select-4-option-1")
+            else:
+                raise Exception(f"Haryana dont have city: {city}")
+
+        elif state.lower() == "rajasthan":
+            self.click("#state #react-select-3-option-3")
+            self.click("#city")
+            if city.lower() == "jaipur":
+                self.click("#city #react-select-4-option-0")
+            elif city.lower() == "jaiselmer":
+                self.click("#city #react-select-4-option-1")
+            else:
+                raise Exception(f"Rajasthan dont have city: {city}")
+
+        else:
+            raise Exception(f"No this state in list: {state}")
+
+    def get_selected_state(self):
+        state = self.locator('#state .css-1dimb5e-singleValue').text_content()
+        return state
+
+    def get_selected_city(self):
+        city = self.locator('#city .css-1dimb5e-singleValue').text_content()
+        return city
