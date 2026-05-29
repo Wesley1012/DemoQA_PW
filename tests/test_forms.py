@@ -11,7 +11,7 @@ class TestForms:
         self.page = FormsPage(page)
         self.page.navigate('automation-practice-form')
 
-
+    @allure.title("Указать пол")
     @pytest.mark.parametrize("Gender",
                              ["Male", "Female", "Other"])
     def test_gender(self, Gender: str):
