@@ -1,15 +1,46 @@
 import pytest
 from pages.form_page import FormsPage
 import allure
+import random
 from faker import Faker
 
 fake = Faker()
+random_data = f'{fake.day_of_month()}, {fake.month_name()}, {fake.year()}'
+OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
+           'Computer Science', 'Social Studies', 'Accounting', 'Maths',
+           'Hindi', 'History', 'Civics', 'Biology', 'Physics')
 
 class TestForms:
     @pytest.fixture(autouse=True)
     def setup_method(self, page):
         self.page = FormsPage(page)
         self.page.navigate('automation-practice-form')
+
+    @allure.title('Заполнить всю форму и подтвердить')
+    @pytest.mark.parametrize('first_name, last_name, email, gender, number, data,\
+                              subject, hobby, picture, address, state, city',
+                             [fake.first_name(), fake.last_name(),
+                              fake.email(),
+                              random.choice(["Male", "Female", "Other"]),
+                              fake.numerify("##########"),
+                              random_data,
+                              random.choice(OPTIONS),
+                              random.choice(["Sport", "Reading", "Music"]),
+                              fake.address()])
+    def test_form(self, first_name: str, last_name: str, email: str, gender: str, number: str, data: str,
+                        subject: str, hobby: str, address: str, state: str, city: str):
+        self.page.fill_first_name(first_name)
+        self.page.fill_last_name(last_name)
+        self.page.fill_email(email)
+        self.page.choose_gender(gender)
+        self.page.fill_number(number)
+        self.page.fill_data(data)
+        self.page.fill_subject(subject)
+        self.page.choose_hobby(hobby)
+        self.page.upload_picture(tmp_path, file_name=f'{fake.word()}.png')
+        self.page.fill_address(address)
+        self.page.select_state_and_city(state, city)
+        self.page.submit_form()
 
     @allure.title("Указать пол")
     @pytest.mark.parametrize("Gender",
@@ -45,7 +76,7 @@ class TestForms:
     @pytest.mark.parametrize('hobby',
                              ["Sport", "Reading", "Music"])
     def test_choice_hobby(self, hobby: str):
-        self.page.choice_hobby(hobby)
+        self.page.choose_hobby(hobby)
 
 
     @allure.title("Загрузить фото")
@@ -61,6 +92,9 @@ class TestForms:
         assert self.page.get_address() == text
 
     @allure.title("Выбор штата и города")
+    @pytest.mark.parametrize('state, city',[
+        ['NCR', ("delhi", "gurgaon", "noida")]
+    ])
     def test_state_and_city(self, state: str, city: str):
         self.page.select_state_and_city(state, city)
         with allure.step('Проверить, что штат и город совпадают'):
@@ -69,9 +103,6 @@ class TestForms:
 
 
 class TestSubjects(TestForms):
-    OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
-               'Computer Science', 'Social Studies', 'Accounting', 'Maths',
-               'Hindi', 'History', 'Civics', 'Biology', 'Physics')
 
     @allure.title("Проверка соответствия выбранной опции")
     @pytest.mark.parametrize('option',

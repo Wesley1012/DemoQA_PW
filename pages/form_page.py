@@ -239,7 +239,7 @@ class FormsPage(BasePage):
         return self
 
     @allure.step("Выбрать хобби {hobby} и проверить")
-    def choice_hobby(self, hobby: str):
+    def choose_hobby(self, hobby: str):
         self.page.wait_for_timeout(300)
 
         if hobby.lower() == "sport":
@@ -340,3 +340,7 @@ class FormsPage(BasePage):
     def get_selected_city(self):
         city = self.locator('#city .css-1dimb5e-singleValue').text_content()
         return city
+
+    def submit_form(self):
+        self.click(self.SUBMIT_BTN)
+        return self
