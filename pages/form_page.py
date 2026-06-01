@@ -98,12 +98,23 @@ class FormsPage(BasePage):
         return self.get_input_value(self.USER_NUMBER)
 
     #Data
-    def fill_data(self, day = "01",
-                  month = "May",
-                  year = "2026"):
-        date = " ".join((day, month, year))
+    def fill_data(self, *args):
+        if len(args) == 3:
+            # Сценарий: три отдельных аргумента
+            day, month, year = args
+            date = f"{day} {month} {year}"
+        elif len(args) == 1:
+            # Сценарий: один аргумент (готовая строка даты)
+            date = args[0]
+        else:
+            raise ValueError(f"Неправильное количество аргументов: {len(args)}. Ожидается 1 или 3")
+
+        self.page.wait_for_timeout(500)
         link = self.locator(self.DATE_OF_BIRTH)
+        link.click()
         link.fill(date)
+        self.page.wait_for_timeout(300)
+        link.press("Enter")
 
         return self
 
@@ -125,7 +136,7 @@ class FormsPage(BasePage):
 
         self.page.wait_for_timeout(500)
         self.click(self.SUBJECTS)
-        self.page.fill(self.SUBJECTS, {input_sub})
+        self.page.fill(self.SUBJECTS, input_sub)
         self.page.wait_for_selector('.subjects-auto-complete__option.subjects-auto-complete__option--is-focused.css-d7l1ni-option')
 
         self.page.wait_for_timeout(500)
@@ -154,10 +165,6 @@ class FormsPage(BasePage):
 
     def remove_subject_by_text(self, text: str):
         try:
-            # self.fill(self.SUBJECTS, text)
-            # options = self.page.locator(".subjects-auto-complete__option")
-            # options.first.click()
-
             remove_btn = self.locator(f".subjects-auto-complete__multi-value__remove[aria-label='Remove {text.title()}']")
             remove_btn.click()
             return self
@@ -165,7 +172,7 @@ class FormsPage(BasePage):
             print(f'Exception: {ex}')
 
 
-    def subjects(self) -> bool:
+    def _subjects(self) -> bool:
         try:
             aria_expanded = self.page.get_attribute("#subjectsInput",
                                                     "aria-expanded") == 'true'
@@ -296,9 +303,9 @@ class FormsPage(BasePage):
             elif city.lower() == "noida":
                 self.click("#city #react-select-4-option-2")
             else:
-                raise f"NCR dont have city: {city}"
+                raise Exception(f"NCR dont have city: {city}")
 
-        elif state.lower() == "uttar Pradesh":
+        elif state.lower() == "uttar pradesh":
             self.click("#state #react-select-4-option-0")
             self.click("#city")
             if city.lower() == "agra":

@@ -5,10 +5,26 @@ import random
 from faker import Faker
 
 fake = Faker()
-random_data = f'{fake.day_of_month()}, {fake.month_name()}, {fake.year()}'
-OPTIONS = ('Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
+random_data = f'{fake.day_of_month()} {fake.month_name()} {fake.year()}'
+OPTIONS = ['Commerce', 'Economics', 'English', 'Chemistry', 'Arts',
            'Computer Science', 'Social Studies', 'Accounting', 'Maths',
-           'Hindi', 'History', 'Civics', 'Biology', 'Physics')
+           'Hindi', 'History', 'Civics', 'Biology', 'Physics']
+
+
+STATE_CITY_PAIRS = [
+    # (state, city)
+    ('NCR', 'Delhi'),
+    ('NCR', 'Gurgaon'),
+    ('NCR', 'Noida'),
+    ('Uttar Pradesh', 'Agra'),
+    ('Uttar Pradesh', 'Lucknow'),
+    ('Uttar Pradesh', 'Merrut'),
+    ('Haryana', 'Karnal'),
+    ('Haryana', 'Panipat'),
+    ('Rajasthan', 'Jaipur'),
+    ('Rajasthan', 'Jaiselmer'),
+]
+selected_pair = random.choice(STATE_CITY_PAIRS)
 
 class TestForms:
     @pytest.fixture(autouse=True)
@@ -18,17 +34,22 @@ class TestForms:
 
     @allure.title('Заполнить всю форму и подтвердить')
     @pytest.mark.parametrize('first_name, last_name, email, gender, number, data,\
-                              subject, hobby, picture, address, state, city',
-                             [fake.first_name(), fake.last_name(),
+                              subject, hobby, picture, address, state, city', [(
+                              fake.first_name(),
+                              fake.last_name(),
                               fake.email(),
                               random.choice(["Male", "Female", "Other"]),
                               fake.numerify("##########"),
                               random_data,
                               random.choice(OPTIONS),
                               random.choice(["Sport", "Reading", "Music"]),
-                              fake.address()])
-    def test_form(self, first_name: str, last_name: str, email: str, gender: str, number: str, data: str,
-                        subject: str, hobby: str, address: str, state: str, city: str):
+                              f'{fake.word()}.png',
+                              fake.address(),
+                              selected_pair[0],  # state
+                              selected_pair[1]   # city
+                                )])
+    def test_form(self, tmp_path, first_name: str, last_name: str, email: str, gender: str, number: str, data: str,
+                        subject: str, hobby: str, picture: str, address: str, state: str, city: str):
         self.page.fill_first_name(first_name)
         self.page.fill_last_name(last_name)
         self.page.fill_email(email)
@@ -37,10 +58,36 @@ class TestForms:
         self.page.fill_data(data)
         self.page.fill_subject(subject)
         self.page.choose_hobby(hobby)
-        self.page.upload_picture(tmp_path, file_name=f'{fake.word()}.png')
+        self.page.upload_picture(tmp_path, picture)
         self.page.fill_address(address)
         self.page.select_state_and_city(state, city)
         self.page.submit_form()
+
+        with allure.step('Проверить форму'):
+            assert self.page.get_first_name() == first_name
+            assert self.page.get_last_name() == last_name
+            if gender == "Other":
+                assert self.page.get_checked_gender() in ("Other", None)
+            else:
+                assert self.page.get_checked_gender() == gender
+            assert self.page.get_number() == number
+            assert self.page.get_data() == data
+            self.page.assert_subject_is_visible(subject)
+            assert self.page.get_picture_path() == f"C:\\fakepath\\{picture}"
+            assert self.page.get_address() == address
+            assert self.page.get_selected_state() == state, f"Штат не совпадает с выбранным: {state}"
+            assert self.page.get_selected_city() == city, f"Город не совпадает с выбранным: {city}"
+
+
+    def test_first_name(self, first_name=fake.first_name()):
+        self.page.fill_first_name(first_name)
+
+        assert self.page.get_first_name() == first_name
+
+    def test_last_name(self, last_name=fake.last_name()):
+        self.page.fill_first_name(last_name)
+
+        assert self.page.get_first_name() == last_name
 
     @allure.title("Указать пол")
     @pytest.mark.parametrize("Gender",
@@ -68,8 +115,8 @@ class TestForms:
     @pytest.mark.parametrize("day, month, year",
                              [(fake.day_of_month(), fake.month_name(), fake.year())])
     def test_date(self, day: str, month: str, year: str):
-        self.page.fill_data()
-        assert self.page.get_data() == "01 May 2026"''
+        self.page.fill_data(day, month, year)
+        assert self.page.get_data() == " ".join((day, month, year))
 
 
     @allure.title("Выбрать хобби {hobby}")
@@ -92,9 +139,8 @@ class TestForms:
         assert self.page.get_address() == text
 
     @allure.title("Выбор штата и города")
-    @pytest.mark.parametrize('state, city',[
-        ['NCR', ("delhi", "gurgaon", "noida")]
-    ])
+    @pytest.mark.parametrize('state, city',
+                             STATE_CITY_PAIRS)
     def test_state_and_city(self, state: str, city: str):
         self.page.select_state_and_city(state, city)
         with allure.step('Проверить, что штат и город совпадают'):
@@ -103,6 +149,15 @@ class TestForms:
 
 
 class TestSubjects(TestForms):
+
+    @allure.title("Выбрать предмет")
+    @pytest.mark.parametrize('subject',
+                             OPTIONS)
+    def test_select_subject(self, subject: str):
+        self.page.fill_subject(subject)
+
+        with allure.step('Проверить, что выбраный предмет отобразился'):
+            self.page.assert_subject_is_visible(subject)
 
     @allure.title("Проверка соответствия выбранной опции")
     @pytest.mark.parametrize('option',
@@ -138,12 +193,6 @@ class TestSubjects(TestForms):
         assert self.page.get_all_options() == option_input
 
 
-    @allure.title("Выбрать предмет")
-    @pytest.mark.parametrize('subject',
-                             OPTIONS)
-    def test_select_and_delete_subject(self, subject: str):
-        self.page.fill_subject(subject)
 
-        with allure.step('Проверить, что выбраный предмет отобразился'):
-            self.page.assert_subject_is_visible(subject)
+
 
