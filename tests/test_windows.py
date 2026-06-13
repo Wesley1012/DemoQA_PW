@@ -9,3 +9,12 @@ class TestWindows:
     def setup_method(self, page):
         self.page = WindowsPage(page)
         self.page.navigate('browser-windows')
+
+    def test_new_tab(self):
+        pass
+
+    def test_new_window(self):
+        pass
+
+    def test_new_window_message(self):
+        pass

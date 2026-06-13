@@ -1,6 +1,4 @@
 from pages.basepage import BasePage
-from locators.elements_locators import *
-from playwright.sync_api import expect
 from dotenv import load_dotenv
 from faker import Faker
 import allure
@@ -22,10 +20,11 @@ class WindowsPage(BasePage):
         self.click(self.NEW_TAB)
         return self
 
+    @allure.step("Открыть новое окно")
     def click_new_window(self):
         self.click(self.NEW_WINDOW)
         return self
-
+    
     def click_new_window_message(self):
         self.click(self.NEW_WINDOW_MESSAGE)
         return self
