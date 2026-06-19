@@ -11,7 +11,8 @@ class TestWindows:
         self.page.navigate('browser-windows')
 
     def test_new_tab(self):
-        pass
+        new_page = self.page.click_new_tab()
+        assert new_page.url == "https://demoqa.com/sample"
 
     def test_new_window(self):
         pass

@@ -16,13 +16,20 @@ class WindowsPage(BasePage):
     NEW_WINDOW = "#windowButton"
     NEW_WINDOW_MESSAGE = "#messageWindowButton"
 
+    @allure.step("Открыть новую вкладку")
     def click_new_tab(self):
-        self.click(self.NEW_TAB)
-        return self
+        with self.page.context.expect_page() as new_page_info:
+            self.click(self.NEW_TAB)
+        new_page = new_page_info.value
+        new_page.wait_for_load_state("domcontentloaded")
+
+        return new_page
+
 
     @allure.step("Открыть новое окно")
     def click_new_window(self):
         self.click(self.NEW_WINDOW)
+        self.page.wait_for_url('https://demoqa.com/browser-windows/sample')
         return self
     
     def click_new_window_message(self):
