@@ -10,6 +10,7 @@ class TestWindows:
         self.page = WindowsPage(page)
         self.page.navigate('browser-windows')
 
+    @allure.title("Открытие новой вкладки")
     def test_new_tab(self):
         new_page = self.page.click_new_tab()
         assert new_page.url == "https://demoqa.com/sample"
